@@ -81,7 +81,6 @@ async def find(ctx, *, question):
                 await ctx.semd('Error')
 
 
-
 @itembot.command()
 async def ping(ctx):
     embed = discord.Embed(
