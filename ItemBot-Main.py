@@ -3,11 +3,10 @@ import discord
 from discord.ext import commands
 import pymysql
 
-itembot = commands.Bot(command_prefix='.')
-TOKEN = open(local file with token).read()
-db_info = pymysql.connect(connection stuff)
+itembot = commands.Bot(command_prefix='.', case_insensitive=True)
+TOKEN = open(r"C:\PycharmProjects\ItemBot\token_file.txt", 'r').read()
+db_info = pymysql.connect('db.ip.goes.here', 'db username', 'passwordgoeshere', 'database name')
 cursor = db_info.cursor()
-sql_query = 'SELECT * FROM ror2_items'
 
 
 # Playing Message
@@ -17,27 +16,27 @@ async def on_ready():
     await itembot.change_presence(status=discord.Status.online, activity=discord.Game('Risk of Rain 2'))
 
 
-#find command, looks up items for ror2 on a database server
+# Find command, looks up items for ror2 on a database server
 @itembot.command()
 async def find(ctx, *, question):
-    sql_query = 'SELECT * FROM item_list'
-    cursor.execute(sql_query)
+    sql_query = "SELECT * FROM item_list where name like %s"
+    cursor.execute(sql_query, (question + "%",))
     results = cursor.fetchall()
     for row in results:
-        if question in row:
+        if question >= row[0]:
             row[0]
             row[1]
             row[2]
             row[3]
             if row[2] == 'white':
                 embedw = discord.Embed(
-                 title=row[0],
+                    title=row[0],
                     description=row[1],
                     color=discord.Color.lighter_grey()
                 )
                 embedw.set_thumbnail(url=row[3])
                 await ctx.send(embed=embedw)
-            elif row[2] == 'uncommon':
+            elif row[2] == 'Uncommon':
                 embed_un = discord.Embed(
                     title=row[0],
                     description=row[1],
@@ -57,7 +56,7 @@ async def find(ctx, *, question):
                 embed_boss = discord.Embed(
                     title=row[0],
                     description=row[1],
-                    color=discord.Color.lighter_yellow()
+                    color=discord.Color(16777014)
                 )
                 embed_boss.set_thumbnail(url=row[3])
                 await ctx.send(embed=embed_boss)
@@ -65,7 +64,7 @@ async def find(ctx, *, question):
                 embed_lun = discord.Embed(
                     title=row[0],
                     description=row[1],
-                    color=discord.Color.blue()
+                    color=discord.Color(52991)
                 )
                 embed_lun.set_thumbnail(url=row[3])
                 await ctx.send(embed=embed_lun)
@@ -73,23 +72,37 @@ async def find(ctx, *, question):
                 embed_eq = discord.Embed(
                     title=row[0],
                     description=row[1],
-                    color=discord.Color.blue()
+                    color=discord.Color(52991)
+                )
+                embed_eq.set_thumbnail(url=row[3])
+                await ctx.send(embed=embed_eq)
+            elif row[2] == 'Lunar Equi':
+                embed_eq = discord.Embed(
+                    title=row[0],
+                    description=row[1],
+                    color=discord.Color(52991)
                 )
                 embed_eq.set_thumbnail(url=row[3])
                 await ctx.send(embed=embed_eq)
             else:
-                await ctx.semd('Error')
+                embed_error = discord.Embed(
+                    title="ERROR",
+                    description="Something went wrong",
+                    color=discord.Color(9633792)
+                )
+                await ctx.send(embed=embed_error)
 
 
 @itembot.command()
 async def ping(ctx):
     embed = discord.Embed(
         title='Latency',
-        description= f'Latency: {round(itembot.latency * 1000)}ms',
+        description=f'Latency: {round(itembot.latency * 1000)}ms',
         color=discord.Color.green()
     )
-    image=open('connectivity.jpg', 'rb').read()
-    embed.set_author(name='', icon_url='https://datacenternews.asia/uploads/story/2016/08/18/ThinkstockPhotos-579142910.jpg')
+    embed.set_author(name='',
+                     icon_url='https://datacenternews.asia/uploads/story/2016/08/18/ThinkstockPhotos-579142910.jpg')
     await ctx.send(embed=embed)
+
 
 itembot.run(TOKEN)
